@@ -2,13 +2,15 @@ from PIL import Image as img
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import pylab
+import tsne
 
 from img_manip_funcs import *
 
 # get the raw 100x100 pixel image
 #im = img.open("mpi_logo_reduced_100x100.jpg")
 # im = img.open("MPI2.png")
-im = img.open("MPI3_400x400.png")
+im = img.open("imgs/MPI3_400x400.png")
 
 im_rgb = im.convert('RGB')
 # test, example:
@@ -56,7 +58,24 @@ Allgrads[:,:,0]=img_horiz_redgrad[:,:,0]
 Allgrads[:,:,1]=img_vert_greengrad[:,:,1]
 Allgrads[:,:,2]=img_rad_blugrad[:,:,2]
 
-vis_arr(Allgrads)
+# vis_arr(Allgrads)
+# =========================================
+
+Allgrads_lin=np.reshape(Allgrads, (Nxpix * Nypix, ncols), order='C')
+
+masked_white_arr_lin = np.reshape(masked_white_arr, (Nxpix * Nypix, ncols), order='C')
+
+
+realness = [ not all(masked_white_arr_lin[p,:]==0) for p in range(masked_white_arr_lin.shape[0]) ]
+realpoints_normed = Allgrads_lin[ realness, :] / np.max(Allgrads_lin)
+
+np.random.shuffle(realpoints_normed)
+
+# Y = tsne.tsne(Allgrads_lin, 2, 3, 20.0)
+Y = tsne.tsne(realpoints_normed, 2, 3, 20.0)
+
+# linearized such that for any x,y
+# Allgrads[x,y,:] == Allgrads_lin[ x*Nypix + y,:]
 
 # pureblack=np.zeros([Nxpix, Nypix, ncols])
 # Eventually convert it back to an image
