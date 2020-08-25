@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 import pylab
 import tsne
+import umap
 
 from img_manip_funcs import *
 
@@ -58,11 +59,11 @@ Allgrads[:,:,0]=img_horiz_redgrad[:,:,0]
 Allgrads[:,:,1]=img_vert_greengrad[:,:,1]
 Allgrads[:,:,2]=img_rad_blugrad[:,:,2]
 
+# This is the image to be reconstructed:
 # vis_arr(Allgrads)
-# =========================================
+
 
 Allgrads_lin=np.reshape(Allgrads, (Nxpix * Nypix, ncols), order='C')
-
 masked_white_arr_lin = np.reshape(masked_white_arr, (Nxpix * Nypix, ncols), order='C')
 
 
@@ -73,6 +74,15 @@ np.random.shuffle(realpoints_normed)
 
 # Y = tsne.tsne(Allgrads_lin, 2, 3, 20.0)
 Y = tsne.tsne(realpoints_normed, 2, 3, 20.0)
+
+np.savetxt("./out/tSNE_outdat.tsv", Y, fmt='%.18e', delimiter='\t')
+
+arr2im = Image.fromarray(masked_white_arr)
+umap_embedding = umap.UMAP( n_neighbors=50, min_dist=0.01, metric='correlation').fit_transform(realpoints)
+
+umap_embedding.save("umap_embedding_out.tsv")
+np.savetxt("/out/umap_out.tsv", umap_embedding, delimiter ="\t")
+
 
 # linearized such that for any x,y
 # Allgrads[x,y,:] == Allgrads_lin[ x*Nypix + y,:]

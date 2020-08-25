@@ -150,7 +150,11 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
         Q = num / np.sum(num)
         Q = np.maximum(Q, 1e-12)
 
-        # Compute gradient
+        # Compute gradient Here is where you (Steffi) want to add some term for
+        # cells in the same blob so that they are forced within a certain
+        # radius of each other. You'll need to add the corresponding
+        # information somewhere higher up to indicate which points are grouped
+        # together.
         PQ = P - Q
         for i in range(n):
             dY[i, :] = np.sum(np.tile(PQ[:, i] * num[:, i], (no_dims, 1)).T * (Y[i, :] - Y), 0)
